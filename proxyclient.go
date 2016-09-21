@@ -128,7 +128,7 @@ type ProxyClient interface {
 func NewProxyClient(addr string) (ProxyClient, error) {
 	u, err := url.Parse(addr)
 	if err != nil {
-		return nil, errors.New("addr 错误的格式")
+		return nil, errors.New("Address cannot be parsed")
 	}
 
 	// 将 query key 转换成为小写
@@ -153,7 +153,7 @@ func NewProxyClient(addr string) (ProxyClient, error) {
 	var upProxy ProxyClient
 	if up, ok := query["upproxy"]; ok == true {
 		if upProxy, err = NewProxyClient(up[0]); err != nil {
-			return nil, fmt.Errorf("upProxy 创建失败：%v", err)
+			return nil, fmt.Errorf("Failed to create upProxy: %v", err)
 		}
 	}
 
@@ -172,7 +172,7 @@ func NewProxyClient(addr string) (ProxyClient, error) {
 		sleep := 0 * time.Millisecond
 		if queryGet("sleep") != "" {
 			if s, err := strconv.Atoi(queryGet("sleep")); err != nil {
-				return nil, fmt.Errorf("sleep 参数错误：%v", err)
+				return nil, fmt.Errorf("sleep parameter error: %v", err)
 			} else {
 				sleep = time.Duration(s) * time.Millisecond
 			}
@@ -211,10 +211,10 @@ func NewProxyClient(addr string) (ProxyClient, error) {
 	case "ss":
 		password, ok := u.User.Password()
 		if ok == false {
-			return nil, fmt.Errorf("ss 代理 method, password 格式错误。")
+			return nil, fmt.Errorf("ss proxy method, password is malformed")
 		}
 		return newSsProxyClient(u.Host, u.User.Username(), password, upProxy, query)
 	default:
-		return nil, fmt.Errorf("未识别的代理类型：%v", scheme)
+		return nil, fmt.Errorf("Proxy method not supported [%v]", scheme)
 	}
 }
